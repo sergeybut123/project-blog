@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1>{{ post.title }}</h1>
+
+{% if current_user.is_authenticated and current_user.id == post.author_id %}
+    <a href="/post/{{ post.id }}/edit">Edit</a>
+    <form method="post" action="/post/{{ post.id }}/delete" style="display:inline;">
+        <button>Delete</button>
+    </form>
+{% endif %}
+
+<p>{{ post.content }}</p>
+
+<h3>Add comment</h3>
+<form method="post">
+    <textarea name="text" required></textarea>
+    <button>Add</button>
+</form>
+
+<hr>
+
+{% macro render_comments(comments) %}
+    <ul>
+    {% for c in comments %}
+        <li>
+            {{ c.text }}
+
+            <form method="post" style="margin-left:20px;">
+                <input type="hidden" name="parent_id" value="{{ c.id }}">
+                <textarea name="text" required></textarea>
+                <button>Reply</button>
+            </form>
+
+            {% if c.children %}
+                {{ render_comments(c.children) }}
+            {% endif %}
+        </li>
+    {% endfor %}
+    </ul>
+{% endmacro %}
+
+{{ render_comments(comments) }}
+
+{% endblock %}
