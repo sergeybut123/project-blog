@@ -18,11 +18,6 @@ login_manager.login_view = "login"
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-@app.before_first_request
-def create_tables():
-    db.create_all()
-
-
 @app.route("/")
 def index():
     q = request.args.get("q")
@@ -141,6 +136,9 @@ def delete_post(id):
     db.session.delete(post)
     db.session.commit()
     return redirect(url_for("index"))
+
+with app.app_context():
+    db.create_all()
 
 if __name__ == "__main__":
     app.run(debug=True)
